@@ -4,6 +4,7 @@ import "./Typing.css";
 
 const NUMB_OF_WORDS = 100;
 const SECONDS = 30;
+var seconds = 0;
 
 const Typing = () => {
   const [words, setWords] = useState([]);
@@ -49,8 +50,10 @@ const Typing = () => {
             clearInterval(interval);
             setStatus("finished");
             setCurrInput("");
+            //seconds = SECONDS;
             return SECONDS;
           } else {
+            seconds += 1;
             return prevCountdown - 1;
           }
         });
@@ -102,7 +105,7 @@ const Typing = () => {
       return "";
     }
   }
-  const typingArea =
+  const typingArea = //To display the typing text box only when game started
     status === "started" ? (
       <input
         ref={textInput}
@@ -116,7 +119,7 @@ const Typing = () => {
       ""
     );
 
-  const Button =
+  const Button = //To display start button only when game is not started
     status !== "started" ? (
       <button className="button is-info is-fullwidth" onClick={start}>
         Start
@@ -125,30 +128,40 @@ const Typing = () => {
       ""
     );
 
-  const ContentBox = status === "started" ? <div className="section">
-  <div className="card">
-    <div className="card-content">
-      <div className="content">
-        {words.map((word, i) => (
-          <span key={i}>
-            {word.split("").map((char, idx) => (
-              <span className={getCharClass(i, idx, char)} key={idx}>
-                {char}
-              </span>
-            ))}
-            <span> </span>
-          </span>
-        ))}
+  const ContentBox = //To display the content box contaning paragraph only when game is going on
+    status === "started" ? (
+      <div className="section">
+        <div className="card">
+          <div className="card-content">
+            <div className="content">
+              {words.map((word, i) => (
+                <span key={i}>
+                  {word.split("").map((char, idx) => (
+                    <span className={getCharClass(i, idx, char)} key={idx}>
+                      {char}
+                    </span>
+                  ))}
+                  <span> </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div> : "";
+    ) : (
+      ""
+    );
 
   return (
     <div className="SpeedTypingGame">
       <div className="section">
         <div className="is-size-1 has-text-centered has-text-primary">
-          <h2>{countDown}</h2>
+          <p>{countDown}</p>
+          {status === "started" && (
+            <span className="column has-text-centered">
+              <p className="is-size-5">WPM:{seconds!=0 ? Math.floor((correct * 60) / seconds) : 0}</p>
+            </span>
+          )}
         </div>
         {ContentBox}
       </div>
@@ -159,7 +172,9 @@ const Typing = () => {
           <div className="columns">
             <div className="column has-text-centered">
               <p className="is-size-5">Words per minute:</p>
-              <p className="has-text-primary is-size-1">{correct}</p>
+              <p className="has-text-primary is-size-1">
+                {(correct * 60) / SECONDS}
+              </p>
             </div>
             <div className="column has-text-centered">
               <p className="is-size-5">Accuracy:</p>
