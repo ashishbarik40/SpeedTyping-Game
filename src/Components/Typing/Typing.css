@@ -76,6 +76,10 @@ body {
   background-color: #8EEB8E;
 }
 
+.has-background-completed{
+  background-color: #007BFF;
+}
+
 .has-background-danger {
   background-color: #FF8A8A;
 }

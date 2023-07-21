@@ -94,13 +94,13 @@ const Typing = () => {
     }
   }
 
-   // to count total characters
-   function countCharacters(){
+  // to count total characters
+  function countCharacters() {
     const wordToCompare = words[currWordIndex];
     const doesItMatch = wordToCompare === currInput.trim();
 
     setTotalCharacters((prev) => prev + wordToCompare.length + 1);
-    
+
     if (doesItMatch) {
       setCorrect((prevCorrect) => prevCorrect + 1);
     } else {
@@ -111,18 +111,16 @@ const Typing = () => {
   }
 
   // to check key matching
-  function checkKeyMatch(key){
+  function checkKeyMatch(key) {
     const word = words[currWordIndex];
     // console.log(word[currCharIndex+1]+" "+key);
 
     // currCharIndex is not updated yet so checking with currCharIndex + 1
 
-    if(word[currCharIndex+1] !== key)
-    {
-        setIncorrectCharacters((prev) => prev + 1);
-        console.log(incorrectCharacters);
+    if (word[currCharIndex + 1] !== key) {
+      setIncorrectCharacters((prev) => prev + 1);
+      console.log(incorrectCharacters);
     }
-    
   }
 
   // function checkMatch() {
@@ -134,7 +132,6 @@ const Typing = () => {
   //     setIncorrect((prevIncorrect) => prevIncorrect + 1);
   //   }
   // }
-
   function getCharClass(wordIdx, charIdx, char) {
     if (
       wordIdx === currWordIndex &&
@@ -145,15 +142,23 @@ const Typing = () => {
       return char === currChar
         ? "has-background-success"
         : "has-background-danger";
+    } else if (wordIdx < currWordIndex) {
+      const word = words[wordIdx];
+      if (charIdx < word.length) {
+        const typedChar = currInput[wordIdx];
+        return word[charIdx] === typedChar
+          ? "has-background-success"
+          : "has-background-completed";
+      }
     } else if (
       wordIdx === currWordIndex &&
       currCharIndex >= words[currWordIndex].length
     ) {
       return "has-background-danger";
-    } else {
-      return "";
     }
+    return "";
   }
+
   const typingArea = //To display the typing text box only when game started
     status === "started" ? (
       <input
@@ -231,7 +236,12 @@ const Typing = () => {
               <p className="is-size-5">Accuracy:</p>
               {correct !== 0 ? (
                 <p className="has-text-info is-size-1">
-                  {Math.round(((totalCharacters - incorrectCharacters) / (totalCharacters)) * 100)}%
+                  {Math.round(
+                    ((totalCharacters - incorrectCharacters) /
+                      totalCharacters) *
+                      100
+                  )}
+                  %
                 </p>
               ) : (
                 <p className="has-text-info is-size-1">0%</p>
