@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import soloImage from "./images/solo1.jpg"; // Import the images
+import { Link } from "react-router-dom";
 import multiplayerImage from "./images/multi.png";
 import globalImage from "./images/global.png";
 import styles from "./Dashboard.module.css";
@@ -17,7 +18,8 @@ const Dashboard = () => {
         {/* Your description content here */}
       </div>
       <div className={styles.cardContainer}>
-        <div
+        <Link
+          to="/dashboard/solo"
           className={`${styles.card} ${
             selectedCard === "solo" ? styles.selected : ""
           }`}
@@ -28,8 +30,9 @@ const Dashboard = () => {
           <div className={styles.cardText}>
             <p>Play a solo game</p>
           </div>
-        </div>
-        <div
+        </Link>
+        <Link
+          to="/dashboard/multi"
           className={`${styles.card} ${
             selectedCard === "multiplayer" ? styles.selected : ""
           }`}
@@ -44,8 +47,8 @@ const Dashboard = () => {
           <div className={styles.cardText}>
             <p>Play with friends</p>
           </div>
-        </div>
-        <div
+        </Link>
+        <Link
           className={`${styles.card} ${
             selectedCard === "global" ? styles.selected : ""
           }`}
@@ -60,7 +63,7 @@ const Dashboard = () => {
           <div className={styles.cardText}>
             <p>Play with players from all over the world</p>
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );
