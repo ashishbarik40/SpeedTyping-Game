@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { generate } from "random-words";
-import "./Typing.css";
+import styles from "./Typing.module.css"
 
 const NUMB_OF_WORDS = 100;
 const SECONDS = 30;
-var seconds = 0;
 
 const Typing = () => {
   const [words, setWords] = useState([]);
@@ -17,6 +16,7 @@ const Typing = () => {
   const [incorrect, setIncorrect] = useState(0);
   const [status, setStatus] = useState("waiting");
   const [incorrectCharacters, setIncorrectCharacters] = useState(0);
+  const [seconds,setSeconds] = useState(0);
   const [totalCharacters, setTotalCharacters] = useState(0);
   const textInput = useRef(null);
 
@@ -44,6 +44,7 @@ const Typing = () => {
       setCurrChar("");
       setIncorrectCharacters(0);
       setTotalCharacters(0);
+      setSeconds(0);
     }
 
     if (status !== "started") {
@@ -51,13 +52,13 @@ const Typing = () => {
       let interval = setInterval(() => {
         setCountDown((prevCountdown) => {
           if (prevCountdown === 0) {
+            setSeconds((sec) => sec+1);
             clearInterval(interval);
             setStatus("finished");
             setCurrInput("");
-            //seconds = SECONDS;
             return SECONDS;
           } else {
-            seconds += 1;
+            setSeconds((sec) => sec+1);
             return prevCountdown - 1;
           }
         });
@@ -104,6 +105,9 @@ const Typing = () => {
     if (doesItMatch) {
       setCorrect((prevCorrect) => prevCorrect + 1);
     } else {
+      if(currInput.trim().length !== wordToCompare.length){
+        setIncorrectCharacters((prev) => prev + (wordToCompare.length-currInput.trim().length));
+      }
       setIncorrect((prevIncorrect) => prevIncorrect + 1);
     }
 
@@ -140,21 +144,21 @@ const Typing = () => {
       status !== "finished"
     ) {
       return char === currChar
-        ? "has-background-success"
-        : "has-background-danger";
+        ? "hasBackgroundSuccess"
+        : "hasBackgroundDanger";
     } else if (wordIdx < currWordIndex) {
       const word = words[wordIdx];
       if (charIdx < word.length) {
         const typedChar = currInput[wordIdx];
         return word[charIdx] === typedChar
-          ? "has-background-success"
-          : "has-background-completed";
+          ? "hasBackgroundSuccess"
+          : "hasBackgroundCompleted";
       }
     } else if (
       wordIdx === currWordIndex &&
       currCharIndex >= words[currWordIndex].length
     ) {
-      return "has-background-danger";
+      return "hasBackgroundDanger";
     }
     return "";
   }
@@ -164,7 +168,7 @@ const Typing = () => {
       <input
         ref={textInput}
         type="text"
-        className="input"
+        className={styles.input}
         onKeyDown={handleKeyDown}
         value={currInput}
         onChange={(e) => setCurrInput(e.target.value)}
@@ -175,7 +179,7 @@ const Typing = () => {
 
   const Button = //To display start button only when game is not started
     status !== "started" ? (
-      <button className="button is-info is-fullwidth" onClick={start}>
+      <button className={`${styles.button} ${styles.isInfo} ${styles.isFullwidth}`} onClick={start}>
         Start
       </button>
     ) : (
@@ -184,14 +188,14 @@ const Typing = () => {
 
   const ContentBox = //To display the content box contaning paragraph only when game is going on
     status === "started" ? (
-      <div className="section">
-        <div className="card">
-          <div className="card-content">
-            <div className="content">
+      <div className={styles.section}>
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
+            <div className={styles.content}>
               {words.map((word, i) => (
                 <span key={i}>
                   {word.split("").map((char, idx) => (
-                    <span className={getCharClass(i, idx, char)} key={idx}>
+                    <span className={styles[getCharClass(i, idx, char)]} key={idx}>
                       {char}
                     </span>
                   ))}
@@ -207,35 +211,36 @@ const Typing = () => {
     );
 
   return (
-    <div className="SpeedTypingGame">
-      <div className="section">
-        <div className="is-size-1 has-text-centered has-text-primary">
+    <div className={styles.typingBody}>
+    <div className={styles.App}>
+      <div className={styles.section}>
+        <div className={`${styles.isSize1} ${styles.hasTextCentered} ${styles.hasTextPrimary}`}>
           <p>{countDown}</p>
           {status === "started" && (
-            <span className="column has-text-centered">
-              <p className="is-size-5">
-                WPM:{seconds != 0 ? Math.floor((correct * 60) / seconds) : 0}
+            <span className={` ${styles.column} ${styles.hasTextCentered}`}>
+              <p className={styles.isSize5}>
+                WPM:{seconds !== 0 ? Math.round((correct * 60) / (SECONDS-countDown)) : 0}
               </p>
             </span>
           )}
         </div>
         {ContentBox}
       </div>
-      <div className="control is-expanded section">{typingArea}</div>
-      <div className="section">{Button}</div>
+      <div className={`${styles.control} ${styles.isExpanded} ${styles.section}`}>{typingArea}</div>
+      <div className={styles.section}>{Button}</div>
       {status === "finished" && (
-        <div className="section">
-          <div className="columns">
-            <div className="column has-text-centered">
-              <p className="is-size-5">Words per minute:</p>
-              <p className="has-text-primary is-size-1">
+        <div className={styles.section}>
+          <div className={styles.columns}>
+            <div className={`${styles.column} ${styles.hasTextCentered}`}>
+              <p className={styles.isSize5}>Words per minute:</p>
+              <p className={`${styles.hasTextPrimary} ${styles.isSize1}`}>
                 {(correct * 60) / SECONDS}
               </p>
             </div>
-            <div className="column has-text-centered">
-              <p className="is-size-5">Accuracy:</p>
+            <div className={`${styles.column} ${styles.hasTextCentered}`}>
+              <p className={styles.isSize5}>Accuracy:</p>
               {correct !== 0 ? (
-                <p className="has-text-info is-size-1">
+                <p className={`${styles.hasTextInfo} ${styles.isSize1}`}>
                   {Math.round(
                     ((totalCharacters - incorrectCharacters) /
                       totalCharacters) *
@@ -244,12 +249,13 @@ const Typing = () => {
                   %
                 </p>
               ) : (
-                <p className="has-text-info is-size-1">0%</p>
+                <p className={`${styles.hasTextInfo} ${styles.isSize1}`}>0%</p>
               )}
             </div>
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

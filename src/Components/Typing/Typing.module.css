@@ -4,7 +4,7 @@
   padding: 0;
 }
 
-body {
+.typingBody {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -72,37 +72,37 @@ body {
   margin-bottom: 1rem;
 }
 
-.has-background-success {
+.hasBackgroundSuccess {
   background-color: #8EEB8E;
 }
 
-.has-background-completed{
-  background-color: #007BFF;
+.hasBackgroundCompleted{
+  color: #8EEB8E;
 }
 
-.has-background-danger {
+.hasBackgroundDanger {
   background-color: #FF8A8A;
 }
 
-.has-text-primary {
+.hasTextPrimary {
   color: #1E0555;
 }
 
-.has-text-info {
+.hasTextInfo {
   color: #007BFF;
 }
 
-.has-text-centered {
+.hasTextCentered {
   text-align: center;
 }
 
-.has-text-primary.is-size-1,
-.has-text-info.is-size-1 {
+.hasTextPrimary.isSize1,
+.hasTextInfo.isSize1 {
   font-size: 3rem;
 }
 
-.has-text-primary.is-size-5,
-.has-text-info.is-size-5 {
+.hasTextPrimary.isSize5,
+.hasTextInfo.isSize5 {
   font-size: 1.2rem;
   font-weight: bold;
 }
