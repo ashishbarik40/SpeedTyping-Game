@@ -16,6 +16,8 @@ const Typing = () => {
   const [correct, setCorrect] = useState(0);
   const [incorrect, setIncorrect] = useState(0);
   const [status, setStatus] = useState("waiting");
+  const [incorrectCharacters, setIncorrectCharacters] = useState(0);
+  const [totalCharacters, setTotalCharacters] = useState(0);
   const textInput = useRef(null);
 
   useEffect(() => {
@@ -40,6 +42,8 @@ const Typing = () => {
       setIncorrect(0);
       setCurrCharIndex(-1);
       setCurrChar("");
+      setIncorrectCharacters(0);
+      setTotalCharacters(0);
     }
 
     if (status !== "started") {
@@ -63,7 +67,11 @@ const Typing = () => {
 
   function handleKeyDown({ keyCode, key }) {
     if (keyCode === 32) {
-      checkMatch();
+      //   checkMatch();
+
+      // calling function to count characters
+      countCharacters();
+
       setCurrInput("");
       setCurrWordIndex((prevIndex) => prevIndex + 1);
       setCurrCharIndex(-1);
@@ -71,20 +79,61 @@ const Typing = () => {
       setCurrCharIndex((prevIndex) => Math.max(prevIndex - 1, -1));
       setCurrChar("");
     } else {
-      setCurrCharIndex((prevIndex) => prevIndex + 1);
+      // console.log(currCharIndex);
+
+      setCurrCharIndex((prevIndex) => prevIndex + 1); // this will be updated at the end
+
+      // console.log(currCharIndex);
+
+      // const wordToCompare = words[currWordIndex];
+      // console.log(wordToCompare[currCharIndex]+" "+key);
+
+      // calling function to check key match
+      checkKeyMatch(key);
       setCurrChar(key);
     }
   }
 
-  function checkMatch() {
+   // to count total characters
+   function countCharacters(){
     const wordToCompare = words[currWordIndex];
     const doesItMatch = wordToCompare === currInput.trim();
+
+    setTotalCharacters((prev) => prev + wordToCompare.length + 1);
+    
     if (doesItMatch) {
       setCorrect((prevCorrect) => prevCorrect + 1);
     } else {
       setIncorrect((prevIncorrect) => prevIncorrect + 1);
     }
+
+    // console.log(totalCharacters);
   }
+
+  // to check key matching
+  function checkKeyMatch(key){
+    const word = words[currWordIndex];
+    // console.log(word[currCharIndex+1]+" "+key);
+
+    // currCharIndex is not updated yet so checking with currCharIndex + 1
+
+    if(word[currCharIndex+1] !== key)
+    {
+        setIncorrectCharacters((prev) => prev + 1);
+        console.log(incorrectCharacters);
+    }
+    
+  }
+
+  // function checkMatch() {
+  //   const wordToCompare = words[currWordIndex];
+  //   const doesItMatch = wordToCompare === currInput.trim();
+  //   if (doesItMatch) {
+  //     setCorrect((prevCorrect) => prevCorrect + 1);
+  //   } else {
+  //     setIncorrect((prevIncorrect) => prevIncorrect + 1);
+  //   }
+  // }
 
   function getCharClass(wordIdx, charIdx, char) {
     if (
@@ -159,7 +208,9 @@ const Typing = () => {
           <p>{countDown}</p>
           {status === "started" && (
             <span className="column has-text-centered">
-              <p className="is-size-5">WPM:{seconds!=0 ? Math.floor((correct * 60) / seconds) : 0}</p>
+              <p className="is-size-5">
+                WPM:{seconds != 0 ? Math.floor((correct * 60) / seconds) : 0}
+              </p>
             </span>
           )}
         </div>
@@ -180,7 +231,7 @@ const Typing = () => {
               <p className="is-size-5">Accuracy:</p>
               {correct !== 0 ? (
                 <p className="has-text-info is-size-1">
-                  {Math.round((correct / (correct + incorrect)) * 100)}%
+                  {Math.round(((totalCharacters - incorrectCharacters) / (totalCharacters)) * 100)}%
                 </p>
               ) : (
                 <p className="has-text-info is-size-1">0%</p>
