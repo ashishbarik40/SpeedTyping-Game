@@ -3,7 +3,7 @@
   height: 100vh;
   padding: 20px;
   text-align: center;
-  background-image: url("./images/background.jpg");
+  background-image: linear-gradient(to right, #a8c0ff, #5e40e3);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -13,10 +13,14 @@
   align-items: center;
   color: rgb(12, 8, 9);
 }
+a {
+  text-decoration: none;
+}
 h1 {
   margin-bottom: 20px;
-  color: #9d0b54;
-  font-size: 36px;
+  color: rgb(37, 39, 40);
+  font-size: 50px;
+  font-family: cursive;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -58,7 +62,7 @@ h1 {
   background-color: #f9f9f9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 10px;
-  max-width: 250px;
+  width: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;

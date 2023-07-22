@@ -28,7 +28,7 @@ const Dashboard = () => {
           <h3>Solo</h3>
           <img src={soloImage} alt="Solo Game" className={styles.cardImage} />
           <div className={styles.cardText}>
-            <p>Play a solo game</p>
+            <p>Play a solo game.</p>
           </div>
         </Link>
         <Link
@@ -45,23 +45,24 @@ const Dashboard = () => {
             className={styles.cardImage}
           />
           <div className={styles.cardText}>
-            <p>Play with friends</p>
+            <p>Play with friends.</p>
           </div>
         </Link>
         <Link
+          to="/dashboard/leaderboard"
           className={`${styles.card} ${
             selectedCard === "global" ? styles.selected : ""
           }`}
           onClick={() => handleCardClick("global")}
         >
-          <h3>Global</h3>
+          <h3>Global Leader Board</h3>
           <img
             src={globalImage}
             alt="Global Game"
             className={styles.cardImage}
           />
           <div className={styles.cardText}>
-            <p>Play with players from all over the world</p>
+            <p>Can see the global leader board.</p>
           </div>
         </Link>
       </div>

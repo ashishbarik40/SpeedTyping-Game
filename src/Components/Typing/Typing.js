@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { generate } from "random-words";
-import styles from "./Typing.module.css"
-
+import styles from "./Typing.module.css";
+import { ReactPropTypes } from "react";
 const NUMB_OF_WORDS = 100;
-const SECONDS = 30;
-
+var SECONDS = 30;
 const Typing = () => {
+  const myNewInfoString = localStorage.getItem("info");
+  // console.log(myNewInfoString);
+  const myInfo = JSON.parse(myNewInfoString);
+  // console.log(myInfo.duration);
+  SECONDS = myInfo.duration;
   const [words, setWords] = useState([]);
   const [countDown, setCountDown] = useState(SECONDS);
   const [currInput, setCurrInput] = useState("");
@@ -16,7 +20,7 @@ const Typing = () => {
   const [incorrect, setIncorrect] = useState(0);
   const [status, setStatus] = useState("waiting");
   const [incorrectCharacters, setIncorrectCharacters] = useState(0);
-  const [seconds,setSeconds] = useState(0);
+  const [seconds, setSeconds] = useState(0);
   const [totalCharacters, setTotalCharacters] = useState(0);
   const textInput = useRef(null);
 
@@ -30,8 +34,29 @@ const Typing = () => {
     }
   }, [status]);
 
+  function capitalizeFirstLetter(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
+
+  function addRandomNumber(word) {
+    const randomNumber = Math.floor(Math.random() * 100); // Generates a random number between 0 and 99
+    return word + randomNumber;
+  }
+
   function generateWords() {
-    return generate(NUMB_OF_WORDS);
+    const diff = myInfo.difficulty;
+    if (diff === "easy") {
+      return generate(NUMB_OF_WORDS);
+    } else if (diff === "medium") {
+      const wordsArray = generate({ exactly: NUMB_OF_WORDS });
+      return wordsArray.map(capitalizeFirstLetter);
+    } else if (diff === "hard") {
+      const wordsArray = generate({ exactly: NUMB_OF_WORDS });
+      const wordsWithNumbers = wordsArray
+        .map(capitalizeFirstLetter)
+        .map(addRandomNumber);
+      return wordsWithNumbers;
+    }
   }
 
   function start() {
@@ -52,13 +77,13 @@ const Typing = () => {
       let interval = setInterval(() => {
         setCountDown((prevCountdown) => {
           if (prevCountdown === 0) {
-            setSeconds((sec) => sec+1);
+            setSeconds((sec) => sec + 1);
             clearInterval(interval);
             setStatus("finished");
             setCurrInput("");
             return SECONDS;
           } else {
-            setSeconds((sec) => sec+1);
+            setSeconds((sec) => sec + 1);
             return prevCountdown - 1;
           }
         });
@@ -67,6 +92,10 @@ const Typing = () => {
   }
 
   function handleKeyDown({ keyCode, key }) {
+    if(keyCode === 16 || key === 'CapsLock')
+    {
+      return;
+    }
     if (keyCode === 32) {
       //   checkMatch();
 
@@ -105,8 +134,10 @@ const Typing = () => {
     if (doesItMatch) {
       setCorrect((prevCorrect) => prevCorrect + 1);
     } else {
-      if(currInput.trim().length !== wordToCompare.length){
-        setIncorrectCharacters((prev) => prev + (wordToCompare.length-currInput.trim().length));
+      if (currInput.trim().length !== wordToCompare.length) {
+        setIncorrectCharacters(
+          (prev) => prev + (wordToCompare.length - currInput.trim().length)
+        );
       }
       setIncorrect((prevIncorrect) => prevIncorrect + 1);
     }
@@ -117,7 +148,7 @@ const Typing = () => {
   // to check key matching
   function checkKeyMatch(key) {
     const word = words[currWordIndex];
-    // console.log(word[currCharIndex+1]+" "+key);
+    console.log(word[currCharIndex+1]+" "+key);
 
     // currCharIndex is not updated yet so checking with currCharIndex + 1
 
@@ -143,9 +174,7 @@ const Typing = () => {
       currChar &&
       status !== "finished"
     ) {
-      return char === currChar
-        ? "hasBackgroundSuccess"
-        : "hasBackgroundDanger";
+      return char === currChar ? "hasBackgroundSuccess" : "hasBackgroundDanger";
     } else if (wordIdx < currWordIndex) {
       const word = words[wordIdx];
       if (charIdx < word.length) {
@@ -179,7 +208,10 @@ const Typing = () => {
 
   const Button = //To display start button only when game is not started
     status !== "started" ? (
-      <button className={`${styles.button} ${styles.isInfo} ${styles.isFullwidth}`} onClick={start}>
+      <button
+        className={`${styles.button} ${styles.isInfo} ${styles.isFullwidth}`}
+        onClick={start}
+      >
         Start
       </button>
     ) : (
@@ -193,9 +225,12 @@ const Typing = () => {
           <div className={styles.cardContent}>
             <div className={styles.content}>
               {words.map((word, i) => (
-                <span key={i}>
+                <span className={styles.spanContent} key={i}>
                   {word.split("").map((char, idx) => (
-                    <span className={styles[getCharClass(i, idx, char)]} key={idx}>
+                    <span
+                      className={styles[getCharClass(i, idx, char)]}
+                      key={idx}
+                    >
                       {char}
                     </span>
                   ))}
@@ -212,50 +247,61 @@ const Typing = () => {
 
   return (
     <div className={styles.typingBody}>
-    <div className={styles.App}>
-      <div className={styles.section}>
-        <div className={`${styles.isSize1} ${styles.hasTextCentered} ${styles.hasTextPrimary}`}>
-          <p>{countDown}</p>
-          {status === "started" && (
-            <span className={` ${styles.column} ${styles.hasTextCentered}`}>
-              <p className={styles.isSize5}>
-                WPM:{seconds !== 0 ? Math.round((correct * 60) / (SECONDS-countDown)) : 0}
-              </p>
-            </span>
-          )}
-        </div>
-        {ContentBox}
-      </div>
-      <div className={`${styles.control} ${styles.isExpanded} ${styles.section}`}>{typingArea}</div>
-      <div className={styles.section}>{Button}</div>
-      {status === "finished" && (
+      <div className={styles.App}>
         <div className={styles.section}>
-          <div className={styles.columns}>
-            <div className={`${styles.column} ${styles.hasTextCentered}`}>
-              <p className={styles.isSize5}>Words per minute:</p>
-              <p className={`${styles.hasTextPrimary} ${styles.isSize1}`}>
-                {(correct * 60) / SECONDS}
-              </p>
-            </div>
-            <div className={`${styles.column} ${styles.hasTextCentered}`}>
-              <p className={styles.isSize5}>Accuracy:</p>
-              {correct !== 0 ? (
-                <p className={`${styles.hasTextInfo} ${styles.isSize1}`}>
-                  {Math.round(
-                    ((totalCharacters - incorrectCharacters) /
-                      totalCharacters) *
-                      100
-                  )}
-                  %
+          <div
+            className={`${styles.isSize1} ${styles.hasTextCentered} ${styles.hasTextPrimary}`}
+          >
+            <p className={styles.countDownSize}>{countDown}</p>
+            {status === "started" && (
+              <span className={` ${styles.column} ${styles.hasTextCentered}`}>
+                <p className={`${styles.isSize5} ${styles.countDownSize}`}>
+                  WPM:
+                  {seconds !== 0
+                    ? Math.round((correct * 60) / (SECONDS - countDown))
+                    : 0}
                 </p>
-              ) : (
-                <p className={`${styles.hasTextInfo} ${styles.isSize1}`}>0%</p>
-              )}
+              </span>
+            )}
+          </div>
+          {ContentBox}
+        </div>
+        <div
+          className={`${styles.control} ${styles.isExpanded} ${styles.section}`}
+        >
+          {typingArea}
+        </div>
+        <div className={styles.section}>{Button}</div>
+        {status === "finished" && (
+          <div className={styles.section}>
+            <div className={styles.columns}>
+              <div className={`${styles.column} ${styles.hasTextCentered}`}>
+                <p className={styles.isSize5}>Words per minute:</p>
+                <p className={`${styles.hasTextPrimary} ${styles.isSize1}`}>
+                  {(correct * 60) / SECONDS}
+                </p>
+              </div>
+              <div className={`${styles.column} ${styles.hasTextCentered}`}>
+                <p className={styles.isSize5}>Accuracy:</p>
+                {correct !== 0 ? (
+                  <p className={`${styles.hasTextInfo} ${styles.isSize1}`}>
+                    {Math.round(
+                      ((totalCharacters - incorrectCharacters) /
+                        totalCharacters) *
+                        100
+                    )}
+                    %
+                  </p>
+                ) : (
+                  <p className={`${styles.hasTextInfo} ${styles.isSize1}`}>
+                    0%
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </div>
   );
 };
