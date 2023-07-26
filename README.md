@@ -44,7 +44,7 @@ Before running the app, make sure you have the following installed on your machi
 
 ## Technologies Used
 
-- React
+- React Js
 - Socket.IO
 - Node.js (for server)
 - Express.js (for server)
